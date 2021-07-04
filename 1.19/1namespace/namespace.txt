@@ -1,0 +1,7 @@
+kubectl get ns
+
+kubectl get ns ns名称
+
+kubectl describe ns ns名称
+
+kubectl describe ns default

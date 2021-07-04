@@ -1,0 +1,6 @@
+cd /mnt/d/Work/GitHub/K8S/1.19/0ConnectAKSChina
+
+az cloud set --name AzureCloud
+az login
+az account set --subscription 3851f1a6-e76d-4c8b-b204-0809652cbe98
+az aks get-credentials --resource-group aks-rg --name leiaks01

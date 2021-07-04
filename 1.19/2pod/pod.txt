@@ -1,0 +1,30 @@
+kubectl create ns dev
+
+kubectl run nginx --image=nginx:latest --port=80 --namespace dev 
+
+kubectl get pod -n dev
+
+kubectl describe pod nginx -n dev
+
+kubectl get pods -n dev -o wide
+NAME    READY   STATUS    RESTARTS   AGE   IP             NODE                                NOMINATED NODE   READINESS GATES
+nginx   1/1     Running   0          20m   10.240.0.105   aks-agentpool-21797102-vmss000000   <none>           <none>
+
+#访问这个pod里的资源
+kubectl exec nginx -n dev curl http://10.240.0.105
+
+#或者通过交互式访问
+kubectl exec -it nginx -n dev -- sh
+
+curl http://10.240.0.105
+
+
+kubectl get pods -n dev
+NAME    READY   STATUS    RESTARTS   AGE
+nginx   1/1     Running   0          113s
+
+kubectl delete pods nginx -n dev
+pod "nginx" deleted
+
+kubectl get pods -n dev
+No resources found in dev namespace
