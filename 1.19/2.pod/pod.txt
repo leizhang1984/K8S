@@ -1,3 +1,5 @@
+cd /mnt/d/Work/GitHub/K8S/1.19/0ConnectAKSChina
+
 kubectl create ns dev
 
 kubectl run nginx --image=nginx:latest --port=80 --namespace dev 
@@ -28,3 +30,6 @@ pod "nginx" deleted
 
 kubectl get pods -n dev
 No resources found in dev namespace
+
+
+kubectl get pods --all-namespaces

@@ -1,0 +1,19 @@
+#设置标签
+kubectl label pod nginx version=1.0 -n dev
+
+#更新标签
+kubectl label pod nginx version=2.0 -n dev --overwrite
+
+#更新标签
+kubectl label pod nginx version=2.0 environment=production -n dev --overwrite
+
+#查看标签
+kubectl get pod nginx -n dev --show-labels
+
+#筛选标签
+kubectl get pod -n dev -l version=2.0  --show-labels
+
+kubectl get pod -n dev -l version!=2.0 --show-labels
+
+#删除标签，
+kubectl label pod nginx version- -n dev

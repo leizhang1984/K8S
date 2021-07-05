@@ -1,4 +1,4 @@
-cd /mnt/d/Work/GitHub/K8S/1.19/0ConnectAKSChina
+cd /mnt/d/Work/GitHub/K8S/1.19/
 
 az cloud set --name AzureCloud
 az login
