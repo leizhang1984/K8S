@@ -1,0 +1,29 @@
+kubectl apply -f deploy-nginx.yaml
+
+#设置类型为cluster ip
+kubectl expose deploy nginx --name=svc-nginx1 --type=ClusterIP --port=80 --target-port=80 -n dev
+
+#获得service地址
+kubectl get svc -o wide -n dev
+#可以看到在cluster ip上
+
+NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE   SELECTOR
+svc-nginx1   ClusterIP   10.0.11.40   <none>        80/TCP    22s   run=nginx
+
+kubectl get pod -n dev
+
+NAME                     READY   STATUS    RESTARTS   AGE
+nginx-5bdb994596-kvqwt   1/1     Running   0          107s
+nginx-5bdb994596-xr6q6   1/1     Running   0          107s
+nginx-5bdb994596-xrdqm   1/1     Running   0          107s
+
+#访问这个nginx服务
+kubectl exec nginx-5bdb994596-kvqwt -n dev -- curl http://10.0.11.40
+
+#或者通过交互式命令，访问pod
+kubectl exec -it nginx-5bdb994596-kvqwt -n dev -- sh
+
+#curl http://10.0.11.40
+
+#访问完毕，通过exit退出pod
+

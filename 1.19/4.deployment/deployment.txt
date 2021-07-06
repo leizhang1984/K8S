@@ -1,1 +1,36 @@
 cd /mnt/d/Work/GitHub/K8S/1.19
+
+kubectl apply -f deploy-nginx.yaml
+
+kubectl get pod -n dev
+
+NAME                     READY   STATUS    RESTARTS   AGE
+nginx-5bdb994596-s2bkb   1/1     Running   0          22s
+nginx-5bdb994596-sf69l   1/1     Running   0          22s
+nginx-5bdb994596-vj4hx   1/1     Running   0          22s
+
+#删除其中一个pod
+kubectl delete pod nginx-5bdb994596-s2bkb -n dev
+
+#会立刻新建一个pod
+kubectl get pod -n dev
+
+
+#删除所有pod，会立刻新建pod
+kubectl delete pod --all -n dev
+
+NAME                     READY   STATUS    RESTARTS   AGE
+nginx-5bdb994596-h8nsl   1/1     Running   0          6s
+nginx-5bdb994596-sf69l   1/1     Running   0          64s
+nginx-5bdb994596-vj4hx   1/1     Running   0          64s
+
+#获得deployment
+kubectl get deployment -n dev
+NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+nginx   3/3     3            3           2m7s
+
+
+#删除deployment,则所有pod都会被删除
+kubectl delete deployment nginx -n dev
+
+
