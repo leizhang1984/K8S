@@ -1,0 +1,36 @@
+kubectl apply -f 4deployment-rollingupdate.yaml
+
+# 变更镜像
+[root@k8s-master01 ~]# kubectl set image deployment pc-deployment nginx=nginx:1.17.3 -n dev 
+deployment.apps/pc-deployment image updated
+​
+# 观察升级过程
+[root@k8s-master01 ~]# kubectl get pods -n dev -w
+NAME                           READY   STATUS    RESTARTS   AGE
+pc-deployment-c848d767-8rbzt   1/1     Running   0          31m
+pc-deployment-c848d767-h4p68   1/1     Running   0          31m
+pc-deployment-c848d767-hlmz4   1/1     Running   0          31m
+pc-deployment-c848d767-rrqcn   1/1     Running   0          31m
+​
+pc-deployment-966bf7f44-226rx   0/1     Pending             0          0s
+pc-deployment-966bf7f44-226rx   0/1     ContainerCreating   0          0s
+pc-deployment-966bf7f44-226rx   1/1     Running             0          1s
+pc-deployment-c848d767-h4p68    0/1     Terminating         0          34m
+​
+pc-deployment-966bf7f44-cnd44   0/1     Pending             0          0s
+pc-deployment-966bf7f44-cnd44   0/1     ContainerCreating   0          0s
+pc-deployment-966bf7f44-cnd44   1/1     Running             0          2s
+pc-deployment-c848d767-hlmz4    0/1     Terminating         0          34m
+​
+pc-deployment-966bf7f44-px48p   0/1     Pending             0          0s
+pc-deployment-966bf7f44-px48p   0/1     ContainerCreating   0          0s
+pc-deployment-966bf7f44-px48p   1/1     Running             0          0s
+pc-deployment-c848d767-8rbzt    0/1     Terminating         0          34m
+​
+pc-deployment-966bf7f44-dkmqp   0/1     Pending             0          0s
+pc-deployment-966bf7f44-dkmqp   0/1     ContainerCreating   0          0s
+pc-deployment-966bf7f44-dkmqp   1/1     Running             0          2s
+pc-deployment-c848d767-rrqcn    0/1     Terminating         0          34m
+​
+# 至此，新版本的pod创建完毕，就版本的pod销毁完毕
+# 中间过程是滚动进行的，也就是边销毁边创建

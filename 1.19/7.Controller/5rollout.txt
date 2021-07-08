@@ -1,0 +1,31 @@
+# 查看当前升级版本的状态
+[root@k8s-master01 ~]# kubectl rollout status deploy pc-deployment -n dev
+deployment "pc-deployment" successfully rolled out
+​
+# 查看升级历史记录
+[root@k8s-master01 ~]# kubectl rollout history deploy pc-deployment -n dev
+deployment.apps/pc-deployment
+REVISION  CHANGE-CAUSE
+1         kubectl create --filename=pc-deployment.yaml --record=true
+2         kubectl create --filename=pc-deployment.yaml --record=true
+3         kubectl create --filename=pc-deployment.yaml --record=true
+# 可以发现有三次版本记录，说明完成过两次升级
+​
+# 版本回滚
+# 这里直接使用--to-revision=1回滚到了1版本， 如果省略这个选项，就是回退到上个版本，就是2版本
+[root@k8s-master01 ~]# kubectl rollout undo deployment pc-deployment --to-revision=1 -n dev
+deployment.apps/pc-deployment rolled back
+​
+# 查看发现，通过nginx镜像版本可以发现到了第一版
+[root@k8s-master01 ~]# kubectl get deploy -n dev -o wide
+NAME            READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES         
+pc-deployment   4/4     4            4           74m   nginx        nginx:1.17.1   
+​
+# 查看rs，发现第一个rs中有4个pod运行，后面两个版本的rs中pod为运行
+# 其实deployment之所以可是实现版本的回滚，就是通过记录下历史rs来实现的，
+# 一旦想回滚到哪个版本，只需要将当前版本pod数量降为0，然后将回滚版本的pod提升为目标数量就可以了
+[root@k8s-master01 ~]# kubectl get rs -n dev
+NAME                       DESIRED   CURRENT   READY   AGE
+pc-deployment-6696798b78   4         4         4       78m
+pc-deployment-966bf7f44    0         0         0       37m
+pc-deployment-c848d767     0         0         0       71m

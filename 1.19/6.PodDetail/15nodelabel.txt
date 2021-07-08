@@ -1,0 +1,17 @@
+kubectl get node --show-labels
+
+kubectl label nodes aks-agentpool-21797102-vmss000002 nodeenv=pro
+
+kubectl apply -f 15pod-nodeselector.yaml
+
+kubectl get node -o wide
+NAME                                STATUS   ROLES   AGE   VERSION    INTERNAL-IP    EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION     CONTAINER-RUNTIME
+aks-agentpool-21797102-vmss000000   Ready    agent   16d   v1.19.11   10.240.0.4     <none>        Ubuntu 18.04.5 LTS   5.4.0-1051-azure   containerd://1.4.4+azure
+aks-agentpool-21797102-vmss000002   Ready    agent   11d   v1.19.11   10.240.0.115   <none>        Ubuntu 18.04.5 LTS   5.4.0-1051-azure   containerd://1.4.4+azure
+
+kubectl get pod -o wide -n dev
+NAME               READY   STATUS    RESTARTS   AGE   IP             NODE                                NOMINATED NODE   READINESS GATES
+pod-nodeselector   1/1     Running   0          16s   10.240.0.146   aks-agentpool-21797102-vmss000002   <none>           <none>
+
+#删除一个Label，只需在命令行最后指定Label的key名并与一个减号相连即可：
+kubectl label nodes aks-agentpool-21797102-vmss000002 nodeenv-

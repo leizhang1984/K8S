@@ -1,0 +1,28 @@
+kubectl apply -f 3deployment-recreate.yaml
+
+# 变更镜像
+[root@k8s-master01 ~]# kubectl set image deployment pc-deployment nginx=nginx:1.17.2 -n dev
+deployment.apps/pc-deployment image updated
+​
+# 观察升级过程
+[root@k8s-master01 ~]#  kubectl get pods -n dev -w
+NAME                             READY   STATUS    RESTARTS   AGE
+pc-deployment-5d89bdfbf9-65qcw   1/1     Running   0          31s
+pc-deployment-5d89bdfbf9-w5nzv   1/1     Running   0          31s
+pc-deployment-5d89bdfbf9-xpt7w   1/1     Running   0          31s
+​
+pc-deployment-5d89bdfbf9-xpt7w   1/1     Terminating   0          41s
+pc-deployment-5d89bdfbf9-65qcw   1/1     Terminating   0          41s
+pc-deployment-5d89bdfbf9-w5nzv   1/1     Terminating   0          41s
+​
+pc-deployment-675d469f8b-grn8z   0/1     Pending       0          0s
+pc-deployment-675d469f8b-hbl4v   0/1     Pending       0          0s
+pc-deployment-675d469f8b-67nz2   0/1     Pending       0          0s
+​
+pc-deployment-675d469f8b-grn8z   0/1     ContainerCreating   0          0s
+pc-deployment-675d469f8b-hbl4v   0/1     ContainerCreating   0          0s
+pc-deployment-675d469f8b-67nz2   0/1     ContainerCreating   0          0s
+​
+pc-deployment-675d469f8b-grn8z   1/1     Running             0          1s
+pc-deployment-675d469f8b-67nz2   1/1     Running             0          1s
+pc-deployment-675d469f8b-hbl4v   1/1     Running             0          2s

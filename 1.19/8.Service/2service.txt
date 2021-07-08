@@ -1,0 +1,5 @@
+#查看service
+kubectl get svc -n dev -o wide
+
+#查看service的详细信息
+kubectl describe svc service-clusterip -n dev

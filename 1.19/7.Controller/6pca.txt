@@ -1,0 +1,28 @@
+#cd /mnt/d/work/github/k8s/1.19/7.Controller
+kubectl apply -f 6pc-hpa-pod.yaml
+
+#创建service
+kubectl expose deployment nginx --type=NodePort --port=80 -n dev
+
+#查看
+kubectl get deployment,pod,svc -n dev
+
+#部署HPA
+kubectl apply -f 6pc-hpa.yaml
+
+#查看HPA
+kubectl get hpa -n dev
+
+
+#==========================================================
+#登录到Master
+kubectl debug node/aks-agentpool-21797102-vmss000000 -it --image=mcr.microsoft.com/aks/fundamental/base-ubuntu:v0.0.11
+
+#更新软件列表
+apt-get update
+
+#安装ab
+apt-get install apache2-utils
+
+#在60秒内发送请求，1次100个
+ab -n 500000000 -c 200  http://10.0.134.96/ 

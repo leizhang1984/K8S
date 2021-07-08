@@ -1,0 +1,42 @@
+接下来，演示下污点的效果：
+
+准备节点node1（为了演示效果更加明显，暂时停止node2节点）
+
+为node1节点设置一个污点: tag=heima:PreferNoSchedule；然后创建pod1( pod1 可以 )
+
+修改为node1节点设置一个污点: tag=heima:NoSchedule；然后创建pod2( pod1 正常 pod2 失败 )
+
+修改为node1节点设置一个污点: tag=heima:NoExecute；然后创建pod3 ( 3个pod都失败 )
+
+# 为node1设置污点(PreferNoSchedule)
+[root@k8s-master01 ~]# kubectl taint nodes aks-agentpool-21797102-vmss000000 tag=heima:PreferNoSchedule
+
+# 创建pod1
+[root@k8s-master01 ~]# kubectl run taint1 --image=nginx:1.17.1 -n dev
+[root@k8s-master01 ~]# kubectl get pods -n dev -o wide
+NAME                      READY   STATUS    RESTARTS   AGE     IP           NODE   
+taint1-7665f7fd85-574h4   1/1     Running   0          2m24s   10.244.1.59   node1    
+
+# 为node1设置污点(取消PreferNoSchedule，设置NoSchedule)
+[root@k8s-master01 ~]# kubectl taint nodes aks-agentpool-21797102-vmss000000 tag:PreferNoSchedule-
+[root@k8s-master01 ~]# kubectl taint nodes aks-agentpool-21797102-vmss000000 tag=heima:NoSchedule
+
+# 创建pod2
+[root@k8s-master01 ~]# kubectl run taint2 --image=nginx:1.17.1 -n dev
+[root@k8s-master01 ~]# kubectl get pods -n dev -o wide
+NAME                      READY   STATUS    RESTARTS   AGE     IP            NODE
+taint1-7665f7fd85-574h4   1/1     Running   0          2m24s   10.244.1.59   node1 
+taint2-544694789-6zmlf    0/1     Pending   0          21s     <none>        <none>   
+
+# 为node1设置污点(取消NoSchedule，设置NoExecute)
+[root@k8s-master01 ~]# kubectl taint nodes aks-agentpool-21797102-vmss000000 tag:NoSchedule-
+[root@k8s-master01 ~]# kubectl taint nodes aks-agentpool-21797102-vmss000000 tag=heima:NoExecute
+#执行完毕后，taint1和taint2立刻被逐出Node
+
+# 创建pod3
+[root@k8s-master01 ~]# kubectl run taint3 --image=nginx:1.17.1 -n dev
+[root@k8s-master01 ~]# kubectl get pods -n dev -o wide
+NAME                      READY   STATUS    RESTARTS   AGE   IP       NODE     NOMINATED 
+taint1-7665f7fd85-htkmp   0/1     Pending   0          35s   <none>   <none>   <none>    
+taint2-544694789-bn7wb    0/1     Pending   0          35s   <none>   <none>   <none>     
+taint3-6d78dbd749-tktkq   0/1     Pending   0          6s    <none>   <none>   <none>     
