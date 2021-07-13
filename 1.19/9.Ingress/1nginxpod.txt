@@ -1,0 +1,12 @@
+#修改mandatory.yaml文件中的仓库
+kubectl apply -f ./
+
+
+kubectl get pod -n ingress-nginx
+NAME                                        READY   STATUS    RESTARTS   AGE
+nginx-ingress-controller-64f6b84884-5r9nh   1/1     Running   0          61s
+
+
+kubectl get svc -n ingress-nginx
+NAME            TYPE       CLUSTER-IP   EXTERNAL-IP   PORT(S)                      AGE
+ingress-nginx   NodePort   10.0.62.60   <none>        80:30153/TCP,443:32529/TCP   16s

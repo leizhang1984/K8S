@@ -1,0 +1,16 @@
+# 创建Pod
+[root@k8s-master01 ~]# kubectl create -f volume-emptydir.yaml
+pod/volume-emptydir created
+​
+# 查看pod
+[root@k8s-master01 ~]# kubectl get pods volume-emptydir -n dev -o wide
+NAME                  READY   STATUS    RESTARTS   AGE      IP       NODE   ...... 
+volume-emptydir       2/2     Running   0          97s   10.42.2.9   node1  ......
+​
+# 通过podIp访问nginx
+[root@k8s-master01 ~]# curl 10.42.2.9
+......
+​
+# 通过kubectl logs命令查看指定容器的标准输出
+[root@k8s-master01 ~]# kubectl logs -f volume-emptydir -n dev -c busybox
+10.42.1.0 - - [27/Jun/2021:15:08:54 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.29.0" "-"

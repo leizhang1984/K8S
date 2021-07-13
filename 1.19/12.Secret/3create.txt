@@ -1,0 +1,15 @@
+# 创建secret
+[root@k8s-master01 ~]# kubectl create -f secret.yaml
+secret/secret created
+
+# 查看secret详情
+[root@k8s-master01 ~]# kubectl describe secret secret -n dev
+Name:         secret
+Namespace:    dev
+Labels:       <none>
+Annotations:  <none>
+Type:  Opaque
+Data
+====
+password:  6 bytes
+username:  5 bytes

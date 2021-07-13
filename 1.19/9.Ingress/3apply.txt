@@ -1,0 +1,6 @@
+kubectl create -f tomcat-nginx.yaml
+
+kubectl get svc -n dev
+NAME             TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+nginx-service    ClusterIP   None         <none>        80/TCP     94s
+tomcat-service   ClusterIP   None         <none>        8080/TCP   94s

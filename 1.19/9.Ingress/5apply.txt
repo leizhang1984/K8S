@@ -1,0 +1,21 @@
+# 创建
+[root@k8s-master01 ~]# kubectl create -f 4ingress-http.yaml
+ingress.extensions/ingress-http created
+​
+# 查看
+[root@k8s-master01 ~]# kubectl get ing ingress-http -n dev
+NAME           HOSTS                                  ADDRESS   PORTS   AGE
+ingress-http   nginx.itheima.com,tomcat.itheima.com             80      22s
+​
+# 查看详情
+[root@k8s-master01 ~]# kubectl describe ing ingress-http  -n dev
+...
+Rules:
+Host                Path  Backends
+----                ----  --------
+nginx.itheima.com   / nginx-service:80 (10.244.1.96:80,10.244.1.97:80,10.244.2.112:80)
+tomcat.itheima.com  / tomcat-service:8080(10.244.1.94:8080,10.244.1.95:8080,10.244.2.111:8080)
+...
+​
+# 接下来,在本地电脑上配置host文件,解析上面的两个域名到192.168.109.100(master)上
+# 然后,就可以分别访问tomcat.itheima.com:32240  和  nginx.itheima.com:32240 查看效果了

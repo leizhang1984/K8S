@@ -1,0 +1,19 @@
+# 创建configmap
+[root@k8s-master01 ~]# kubectl create -f configmap.yaml
+configmap/configmap created
+
+# 查看configmap详情
+[root@k8s-master01 ~]# kubectl describe cm configmap -n dev
+Name:         configmap
+Namespace:    dev
+Labels:       <none>
+Annotations:  <none>
+
+Data
+====
+info:
+----
+username:admin
+password:123456
+
+Events:  <none>

@@ -1,0 +1,21 @@
+# 创建pod
+[root@k8s-master01 ~]# kubectl create -f pod-configmap.yaml
+pod/pod-configmap created
+
+# 查看pod
+[root@k8s-master01 ~]# kubectl get pod pod-configmap -n dev
+NAME            READY   STATUS    RESTARTS   AGE
+pod-configmap   1/1     Running   0          6s
+
+#进入容器
+[root@k8s-master01 ~]# kubectl exec -it pod-configmap -n dev /bin/sh
+# cd /configmap/config/
+# ls
+info
+# more info
+username:admin
+password:123456
+
+# 可以看到映射已经成功，每个configmap都映射成了一个目录
+# key--->文件     value---->文件中的内容
+# 此时如果更新configmap的内容, 容器中的值也会动态更新

@@ -1,0 +1,17 @@
+# 创建pod
+[root@k8s-master01 ~]# kubectl create -f pod-secret.yaml
+pod/pod-secret created
+
+# 查看pod
+[root@k8s-master01 ~]# kubectl get pod pod-secret -n dev
+NAME            READY   STATUS    RESTARTS   AGE
+pod-secret      1/1     Running   0          2m28s
+
+# 进入容器，查看secret信息，发现已经自动解码了
+[root@k8s-master01 ~]# kubectl exec -it pod-secret /bin/sh -n dev
+/ # ls /secret/config/
+password  username
+/ # more /secret/config/username
+admin
+/ # more /secret/config/password
+123456
