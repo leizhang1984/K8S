@@ -1,0 +1,17 @@
+rgname=aks-rg
+aksname=leiaks01
+pipname=AKSAppGW-PIP
+appgwname=AKSAppGW
+vnetname=aks-rg-vnet
+subnetname=appgw-subnet
+
+
+#create new app gw
+az network public-ip create -n pipname -g $rgname --allocation-method Static --sku Standard
+az network application-gateway create -n $appgwname -l chinaeast2 -g $rgname --sku Standard_v2 --public-ip-address $pipname --vnet-name $vnetname --subnet $subnetname
+
+#Enable the AGIC add-on in existing AKS cluster through Portal
+
+kubectl apply -f 1agic.yaml
+
+40.72.185.5 (ingress-appgateway-appgwpip)
