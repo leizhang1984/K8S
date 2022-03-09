@@ -1,11 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx81
+  name: internal-80
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "lb-subnet"
 spec:
   type: LoadBalancer
+  loadBalancerIP: 10.241.0.4
   ports:
-  - port: 81
+  - port: 80
     protocol: TCP
     targetPort: 80
   selector:
