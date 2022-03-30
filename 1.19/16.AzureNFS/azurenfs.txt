@@ -1,0 +1,121 @@
+rgname=leiaks-rg2
+vnetname=aks_vnet
+location=chinaeast2
+
+#create resource group
+az group create -n $rgname -l $location
+
+#create azure vnet，including 3 subnets
+az network vnet create -g $rgname -n $vnetname \
+  --address-prefixes 10.0.0.0/8 --subnet-name aks-subnet \
+  --subnet-prefixes 10.240.0.0/16
+
+#subnet for VM
+az network vnet subnet create -g $rgname --vnet-name $vnetname \
+  -n vm-subnet --address-prefixes 10.241.0.0/24 
+
+#subnet for nfs
+az network vnet subnet create -g $rgname --vnet-name $vnetname \
+  -n nfs-subnet --address-prefixes 10.241.1.0/24 
+
+#create storage account
+storageaccountname=leiaksnfsstorage02
+az storage account create \
+  --name $storageaccountname \
+  --resource-group $rgname \
+  --location $location \
+  --sku Premium_LRS \
+  --kind FileStorage
+
+#deny https only
+az storage account update --https-only false \
+  --name $storageaccountname --resource-group $rgname
+
+#create azure file storage with 100GB quota
+az storage share-rm create \
+  --storage-account $storageaccountname \
+  --enabled-protocol NFS \
+  --root-squash RootSquash \
+  --name "aksnfsshare" \
+  --quota 100
+
+#create private endpoint
+subnetid=`az network vnet subnet show \
+  --resource-group $rgname \
+  --vnet-name $vnetname \
+  --name nfs-subnet \
+  --query "id" -o tsv `
+
+storageaccountid=`az storage account show \
+  --resource-group $rgname \
+  --name $storageaccountname \
+  --query "id" -o tsv `
+
+az network vnet subnet update \
+  --ids $subnetid \
+  --disable-private-endpoint-network-policies 
+
+endpoint=`az network private-endpoint create \
+  --resource-group $rgname \
+  --name "$storageaccountname-privateendpoint" \
+  --location $location \
+  --subnet $subnetid \
+  --private-connection-resource-id $storageaccountid \
+  --group-id "file" \
+  --connection-name "$storageaccountname-connection" \
+  --query "id" -o tsv `
+
+#create private dns zone
+privatednszonename="privatelink.file.core.chinacloudapi.cn"
+
+vnetid=`az network vnet show \
+  --resource-group $rgname \
+  --name $vnetname \
+  --query "id" -o tsv`
+
+dnszoneid=`az network private-dns zone create \
+  --resource-group $rgname \
+  --name $privatednszonename \
+  --query "id" -o tsv`
+  
+az network private-dns link vnet create \
+  --resource-group $rgname \
+  --zone-name $privatednszonename \
+  --name "$vnetname-dnslink" \
+  --virtual-network $vnetid \
+  --registration-enabled false 
+
+privateendpointnic=`az network private-endpoint show \
+  --ids $endpoint \
+  --query "networkInterfaces[0].id" -o tsv `
+
+endpointip=`az network nic show \
+  --ids $privateendpointnic \
+  --query "ipConfigurations[0].privateIpAddress" -o tsv `
+
+az network private-dns record-set a create \
+        --resource-group $rgname \
+        --zone-name $privatednszonename \
+        --name $storageaccountname
+
+az network private-dns record-set a add-record \
+        --resource-group $rgname \
+        --zone-name $privatednszonename  \
+        --record-set-name $storageaccountname \
+        --ipv4-address $endpointip
+
+
+#Create a centos 6.10 VM In vm-subnet
+
+sudo yum update
+sudo yum install nfs-utils
+
+sudo mkdir -p /mount/leiaksnfsstorage02/aksnfsshare
+sudo mount -t nfs leiaksnfsstorage02.file.core.chinacloudapi.cn:/leiaksnfsstorage02/aksnfsshare /mount/leiaksnfsstorage02/aksnfsshare -o vers=4,minorversion=1,sec=sys
+
+
+#Create AKS in aks-subnet
+#步骤略
+
+
+
