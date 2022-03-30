@@ -1,3 +1,6 @@
+az cloud set -n AzureChinaCloud
+az login
+
 rgname=leiaks-rg2
 vnetname=aks_vnet
 location=chinaeast2
