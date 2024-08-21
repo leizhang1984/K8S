@@ -1,0 +1,25 @@
+az login --tenant '16b3c013-d300-468d-ac64-7eda0820b6d3'
+
+az aks get-credentials -g aks-rg -n aks1-27-9
+
+kubectl apply -f 1.azure-file-sc.yaml
+
+kubectl apply -f 2.azure-file-pvc.yaml
+
+kubectl get pvc my-azurefile
+
+kubectl apply -f 3.azure-pvc-files.yaml
+
+kubectl get pod
+
+kubectl exec mypod -it -- sh
+
+
+===========================================
+kubectl delete pvc my-azurefile
+
+kubectl delete storageclass my-azurefile
+
+=============================================
+
+https://learn.microsoft.com/en-us/azure/aks/monitor-aks
