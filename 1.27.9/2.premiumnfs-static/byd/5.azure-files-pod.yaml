@@ -1,8 +1,0 @@
-kind: Pod
-apiVersion: v1
-metadata:
-  name: mypod1
-spec:
-  containers:
-    - name: mypod1
-      image: mcr.microsoft.com/oss/nginx/nginx:1.15.5-alpine
